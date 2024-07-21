@@ -1,0 +1,36 @@
+import pandas as pd
+import json
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import SGDClassifier
+
+def load_data(file_name=None):
+    if file_name:
+        with open(file_name, 'r', encoding='utf-8') as f:
+            n = int(f.readline()) # get number of lines of data
+            data = [json.loads(f.readline()) for _ in range(n)]
+    else:
+        n = int(input()) # get number of lines of data
+        data = [json.loads(input()) for _ in range(n)]
+        
+    df = pd.DataFrame.from_records(data)
+    df['X'] = df['question'] + ' ' + df['excerpt']
+    
+    return df
+
+# define models
+tfidf = TfidfVectorizer(stop_words='english', ngram_range=(1,2), 
+                        max_df=0.07, sublinear_tf=True)
+clf = SGDClassifier(loss='hinge', alpha=0.00005, penalty='l2',
+                    random_state=0, class_weight='balanced')
+
+# train models
+df_train = load_data('training.json')
+clf.fit(tfidf.fit_transform(df_train.X), df_train.topic)
+
+# predict on input data
+df_test = load_data()
+y_pred = clf.predict(tfidf.transform(df_test.X))
+
+# output predictions
+for y in y_pred:
+    print(y)
