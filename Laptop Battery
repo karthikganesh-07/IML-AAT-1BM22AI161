@@ -1,0 +1,20 @@
+inp = input()
+fid = open("trainingdata.txt", "r")
+train = [ ]
+vals = [ ]
+for line in fid:
+    temp = line.rstrip().split(',')
+    if float(temp[0]) < 4.0:
+        train.append(float(temp[0]))
+        vals.append(float(temp[1]))
+num = 0
+den = 0
+for i in range(len(train)):
+    num = num + train[i]*train[i]
+for i in range(len(train)):
+    den = den + train[i]*vals[i]
+if float(inp) < 4.0:   
+    out = float(inp) * den / num
+else:
+    out = 8.00
+print("%.2f" % out)
